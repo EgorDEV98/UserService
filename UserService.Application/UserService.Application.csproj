@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\UserService.Contracts\UserService.Contracts.csproj" />
       <ProjectReference Include="..\UserService.Data\UserService.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Riok.Mapperly" Version="4.2.0" />
     </ItemGroup>
 
 </Project>
