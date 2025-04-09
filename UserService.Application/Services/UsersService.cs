@@ -29,31 +29,25 @@ public class UsersService : IUsersService
         _passwordHasher = passwordHasher;
         _jwtProvider = jwtProvider;
     }
-
+    
     /// <summary>
-    /// Авторизовать пользователя
+    /// Получить пользователя по входным данным
     /// </summary>
     /// <param name="param">Параметры</param>
     /// <param name="ct">Токен</param>
     /// <returns></returns>
-    public async Task<AuthResponse> AuthUserAsync(AuthUserParams param, CancellationToken ct)
+    public async Task<GetUserResponse> ValidateLogin(AuthUserParams param, CancellationToken ct)
     {
+        var hashedPassword = _passwordHasher.HashPassword(param.Password);
         var user = await _context.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Login == param.Login, ct);
-        if (user is null) UnauthorizedException.Throw("Invalid login or password");
+        if(user is null) UnauthorizedException.Throw("Invalid login or password");
         
-        var isVerifyPassword = _passwordHasher.VerifyPassword(param.Password, user!.Password);
-        if(!isVerifyPassword) UnauthorizedException.Throw("Invalid login or password");
-
-        return new AuthResponse()
-        {
-            JwtToken = _jwtProvider.GenerateJwtToken(new JwtModel()
-            {
-                UserId = user.Id,
-                Name = user.Name,
-            })
-        };
+        var isVerified = _passwordHasher.VerifyPassword(hashedPassword, param.Password);
+        if(!isVerified) UnauthorizedException.Throw("Invalid login or password");
+        
+        return _mapper.Map(user!);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using CommonLib.Response;
+using Microsoft.AspNetCore.Mvc;
 using Refit;
 using UserService.Contracts.Models.Request;
 using UserService.Contracts.Models.Response;
@@ -8,13 +9,13 @@ namespace UserService.Contracts.Clients;
 public interface IUsersClient
 {
     /// <summary>
-    /// Авторизовать пользователя
+    /// Получить пользователя по входным данным
     /// </summary>
-    /// <param name="request">Параметры</param>
+    /// <param name="param">Параметры</param>
     /// <param name="ct">Токен</param>
     /// <returns></returns>
-    [Post("/auth")]
-    public Task<BaseResponse<AuthResponse>> GetAuthAsync(AuthRequest request, CancellationToken ct);
+    [Post("/Users/Verify")]
+    public Task<BaseResponse<GetUserResponse>> ValidateLogin([FromBody] AuthRequest param, CancellationToken ct);
     
     /// <summary>
     /// Получить конкретного пользователя

@@ -26,39 +26,7 @@ public class UserServiceTests
 
         Seed();
     }
-
-    #region Auth
-
-    [Fact]
-    public async Task Auth_Success()
-    {
-        var result = await _userService.AuthUserAsync(new AuthUserParams()
-        {
-            Login = "TEST_LOGIN",
-            Password = "TEST_PASSWORD",
-        }, CancellationToken.None);
-
-        using (new AssertionScope())
-        {
-            result.JwtToken.Should().NotBeNullOrEmpty();
-        }
-    }
     
-    [Fact]
-    public async Task Auth_Unauthorized()
-    {
-        await Assert.ThrowsAsync<UnauthorizedException>(async () =>
-        {
-            await _userService.AuthUserAsync(new AuthUserParams()
-            {
-                Login = string.Empty,
-                Password = string.Empty,
-            }, CancellationToken.None);
-        });
-    }
-
-    #endregion
-
     #region GetUser
 
     [Fact]

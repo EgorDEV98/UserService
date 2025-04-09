@@ -18,20 +18,20 @@ public class UsersController : ControllerBase, IUsersClient
     {
         _usersService = usersService;
     }
-
+    
     /// <summary>
-    /// Авторизовать пользователя
+    /// Получить пользователя по входным данным
     /// </summary>
-    /// <param name="request">Параметры</param>
+    /// <param name="param">Параметры</param>
     /// <param name="ct">Токен</param>
     /// <returns></returns>
-    [HttpPost("auth")]
-    public async Task<BaseResponse<AuthResponse>> GetAuthAsync(AuthRequest request, CancellationToken ct)
+    [HttpPost("Verify")]
+    public async Task<BaseResponse<GetUserResponse>> ValidateLogin(AuthRequest param, CancellationToken ct)
     {
-        var result = await _usersService.AuthUserAsync(new AuthUserParams()
+        var result = await _usersService.ValidateLogin(new AuthUserParams()
         {
-            Login = request.Login,
-            Password = request.Password
+            Login = param.Login,
+            Password = param.Password
         }, ct);
         return AppResponse.Create(result);
     }
