@@ -6,6 +6,14 @@ namespace UserService.Application.Interfaces;
 public interface IUsersService
 {
     /// <summary>
+    /// Авторизовать пользователя
+    /// </summary>
+    /// <param name="param">Параметры</param>
+    /// <param name="ct">Токен</param>
+    /// <returns></returns>
+    public Task<AuthResponse> AuthUserAsync(AuthUserParams param, CancellationToken ct);
+    
+    /// <summary>
     /// Получить конкретного пользователя
     /// </summary>
     /// <param name="param">Параметры</param>

@@ -1,5 +1,7 @@
 using CommonLib.Exceptions;
 using CommonLib.Other.DateTimeProvider;
+using CommonLib.Other.JwtProvider;
+using CommonLib.Other.PasswordHasher;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +17,47 @@ public class UserServiceTests
 {
     private readonly UserServiceDbContextMock _context;
     private readonly UsersService _userService;
-
+    private readonly IPasswordHasher _passwordHasher;
     public UserServiceTests()
     {
         _context = UsersMock.Create();
-        _userService = new UsersService(_context, new UsersServiceMapper(), new DateTimeProvider());
+        _passwordHasher = new PasswordHasher();
+        _userService = new UsersService(_context, new UsersServiceMapper(), new DateTimeProvider(), _passwordHasher, new JwtProvider(new DateTimeProvider()));
 
         Seed();
     }
+
+    #region Auth
+
+    [Fact]
+    public async Task Auth_Success()
+    {
+        var result = await _userService.AuthUserAsync(new AuthUserParams()
+        {
+            Login = "TEST_LOGIN",
+            Password = "TEST_PASSWORD",
+        }, CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            result.JwtToken.Should().NotBeNullOrEmpty();
+        }
+    }
+    
+    [Fact]
+    public async Task Auth_Unauthorized()
+    {
+        await Assert.ThrowsAsync<UnauthorizedException>(async () =>
+        {
+            await _userService.AuthUserAsync(new AuthUserParams()
+            {
+                Login = string.Empty,
+                Password = string.Empty,
+            }, CancellationToken.None);
+        });
+    }
+
+    #endregion
 
     #region GetUser
 
@@ -202,7 +237,7 @@ public class UserServiceTests
             Id = new Guid("4F66943B-D74D-4BE4-BE65-17333D71F984"),
             Name = "TEST_NAME",
             City = "TEST_CITY",
-            Password = "TEST_PASSWORD",
+            Password = _passwordHasher.HashPassword("TEST_PASSWORD"),
             Login = "TEST_LOGIN",
             CreatedDate = new DateTime(2025, 4, 1),
             LastUpdate = new DateTime(2025, 4, 1),
@@ -213,7 +248,7 @@ public class UserServiceTests
             Id = new Guid("52F7D87D-0610-4F12-BB25-BAF76EA0E276"),
             Name = "TEST_NAME_2",
             City = "TEST_CITY_2",
-            Password = "TEST_PASSWORD_2",
+            Password = _passwordHasher.HashPassword("TEST_PASSWORD_2"),
             Login = "TEST_LOGIN_2",
             CreatedDate = new DateTime(2025, 4, 1),
             LastUpdate = new DateTime(2025, 4, 2),

@@ -20,6 +20,23 @@ public class UsersController : ControllerBase, IUsersClient
     }
 
     /// <summary>
+    /// Авторизовать пользователя
+    /// </summary>
+    /// <param name="request">Параметры</param>
+    /// <param name="ct">Токен</param>
+    /// <returns></returns>
+    [HttpPost("auth")]
+    public async Task<BaseResponse<AuthResponse>> GetAuthAsync(AuthRequest request, CancellationToken ct)
+    {
+        var result = await _usersService.AuthUserAsync(new AuthUserParams()
+        {
+            Login = request.Login,
+            Password = request.Password
+        }, ct);
+        return AppResponse.Create(result);
+    }
+
+    /// <summary>
     /// Получить конкретного пользователя
     /// </summary>
     /// <param name="id">Идентификатор пользователя</param>

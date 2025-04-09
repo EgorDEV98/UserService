@@ -1,3 +1,4 @@
+using CommonLib;
 using CommonLib.EFCore.Extensions;
 using CommonLib.Middlewares;
 using UserService.Data;
@@ -21,6 +22,8 @@ await app.Services.ApplyMigrationAsync<UserServiceDbContext>();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseAuthorization();
+app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseGlobalExceptionHandler();
 app.MapControllers();

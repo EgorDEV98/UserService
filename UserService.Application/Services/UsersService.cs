@@ -1,6 +1,8 @@
 using CommonLib.EFCore.Extensions;
 using CommonLib.Exceptions;
 using CommonLib.Other.DateTimeProvider;
+using CommonLib.Other.JwtProvider;
+using CommonLib.Other.PasswordHasher;
 using Microsoft.EntityFrameworkCore;
 using UserService.Application.Interfaces;
 using UserService.Application.Mappers;
@@ -16,14 +18,44 @@ public class UsersService : IUsersService
     private readonly UserServiceDbContext _context;
     private readonly UsersServiceMapper _mapper;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtProvider _jwtProvider;
 
-    public UsersService(UserServiceDbContext context, UsersServiceMapper mapper, IDateTimeProvider dateTimeProvider)
+    public UsersService(UserServiceDbContext context, UsersServiceMapper mapper, IDateTimeProvider dateTimeProvider, IPasswordHasher passwordHasher, IJwtProvider jwtProvider)
     {
         _context = context;
         _mapper = mapper;
         _dateTimeProvider = dateTimeProvider;
+        _passwordHasher = passwordHasher;
+        _jwtProvider = jwtProvider;
     }
-    
+
+    /// <summary>
+    /// Авторизовать пользователя
+    /// </summary>
+    /// <param name="param">Параметры</param>
+    /// <param name="ct">Токен</param>
+    /// <returns></returns>
+    public async Task<AuthResponse> AuthUserAsync(AuthUserParams param, CancellationToken ct)
+    {
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Login == param.Login, ct);
+        if (user is null) UnauthorizedException.Throw("Invalid login or password");
+        
+        var isVerifyPassword = _passwordHasher.VerifyPassword(param.Password, user!.Password);
+        if(!isVerifyPassword) UnauthorizedException.Throw("Invalid login or password");
+
+        return new AuthResponse()
+        {
+            JwtToken = _jwtProvider.GenerateJwtToken(new JwtModel()
+            {
+                UserId = user.Id,
+                Name = user.Name,
+            })
+        };
+    }
+
     /// <summary>
     /// Получить пользователя
     /// </summary>
@@ -71,7 +103,7 @@ public class UsersService : IUsersService
         {
             Name = param.Name,
             Login = param.Login,
-            Password = param.Password,
+            Password = _passwordHasher.HashPassword(param.Password),
             City = param.City,
             CreatedDate = currentDate,
             LastUpdate = currentDate
@@ -96,7 +128,11 @@ public class UsersService : IUsersService
         if (user is null) NotFoundException.Throw("User is not found");
 
         user!.City = param.City ?? user.City;
-        user.Password = param.Password ?? user.Password;
+
+        if (!string.IsNullOrWhiteSpace(param.Password))
+        {
+            user.Password = _passwordHasher.HashPassword(param.Password);
+        }
         user.Name = param.Name ?? user.Name;
         user.LastUpdate = _dateTimeProvider.GetCurrent();
 

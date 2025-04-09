@@ -8,6 +8,15 @@ namespace UserService.Contracts.Clients;
 public interface IUsersClient
 {
     /// <summary>
+    /// Авторизовать пользователя
+    /// </summary>
+    /// <param name="request">Параметры</param>
+    /// <param name="ct">Токен</param>
+    /// <returns></returns>
+    [Post("/auth")]
+    public Task<BaseResponse<AuthResponse>> GetAuthAsync(AuthRequest request, CancellationToken ct);
+    
+    /// <summary>
     /// Получить конкретного пользователя
     /// </summary>
     /// <param name="id">Идентификатор пользователя</param>
