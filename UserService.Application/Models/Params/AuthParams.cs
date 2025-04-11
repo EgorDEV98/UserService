@@ -1,9 +1,6 @@
-namespace UserService.Contracts.Models.Request;
+namespace UserService.Application.Models.Params;
 
-/// <summary>
-/// Модель авторизации пользователя
-/// </summary>
-public class AuthRequest
+public class AuthParams
 {
     /// <summary>
     /// Логин пользователя

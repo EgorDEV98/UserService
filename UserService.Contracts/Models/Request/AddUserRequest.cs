@@ -1,7 +1,7 @@
 namespace UserService.Contracts.Models.Request;
 
 /// <summary>
-/// Добавить пользователя
+/// Модель добавления пользователя
 /// </summary>
 public class AddUserRequest
 {

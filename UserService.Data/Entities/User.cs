@@ -15,17 +15,17 @@ public class User : IEntity
     /// <summary>
     /// Имя пользователя
     /// </summary>
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     /// <summary>
     /// Логин пользователя
     /// </summary>
-    public string Login { get; set; }
+    public required string Login { get; set; }
     
     /// <summary>
     /// Зашифрованный пароль пользователя
     /// </summary>
-    public string Password { get; set; }
+    public required string Password { get; set; }
     
     /// <summary>
     /// город пользователя

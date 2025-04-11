@@ -9,15 +9,6 @@ namespace UserService.Contracts.Clients;
 public interface IUsersClient
 {
     /// <summary>
-    /// Получить пользователя по входным данным
-    /// </summary>
-    /// <param name="param">Параметры</param>
-    /// <param name="ct">Токен</param>
-    /// <returns></returns>
-    [Post("/Users/Verify")]
-    public Task<BaseResponse<GetUserResponse>> ValidateLogin([FromBody] AuthRequest param, CancellationToken ct);
-    
-    /// <summary>
     /// Получить конкретного пользователя
     /// </summary>
     /// <param name="id">Идентификатор пользователя</param>

@@ -20,23 +20,6 @@ public class UsersController : ControllerBase, IUsersClient
     }
     
     /// <summary>
-    /// Получить пользователя по входным данным
-    /// </summary>
-    /// <param name="param">Параметры</param>
-    /// <param name="ct">Токен</param>
-    /// <returns></returns>
-    [HttpPost("Verify")]
-    public async Task<BaseResponse<GetUserResponse>> ValidateLogin(AuthRequest param, CancellationToken ct)
-    {
-        var result = await _usersService.ValidateLogin(new AuthUserParams()
-        {
-            Login = param.Login,
-            Password = param.Password
-        }, ct);
-        return AppResponse.Create(result);
-    }
-
-    /// <summary>
     /// Получить конкретного пользователя
     /// </summary>
     /// <param name="id">Идентификатор пользователя</param>

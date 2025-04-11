@@ -29,25 +29,6 @@ public class UsersService : IUsersService
         _passwordHasher = passwordHasher;
         _jwtProvider = jwtProvider;
     }
-    
-    /// <summary>
-    /// Получить пользователя по входным данным
-    /// </summary>
-    /// <param name="param">Параметры</param>
-    /// <param name="ct">Токен</param>
-    /// <returns></returns>
-    public async Task<GetUserResponse> ValidateLogin(AuthUserParams param, CancellationToken ct)
-    {
-        var user = await _context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Login == param.Login, ct);
-        if(user is null) UnauthorizedException.Throw("Invalid login or password");
-        
-        var isVerified = _passwordHasher.VerifyPassword(param.Password, user!.Password);
-        if(!isVerified) UnauthorizedException.Throw("Invalid login or password");
-        
-        return _mapper.Map(user!);
-    }
 
     /// <summary>
     /// Получить пользователя
