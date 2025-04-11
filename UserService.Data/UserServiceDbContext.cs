@@ -10,9 +10,12 @@ public class UserServiceDbContext : DbContext
     /// Пользователи
     /// </summary>
     public DbSet<User> Users { get; set; }
-    
+
     public UserServiceDbContext(DbContextOptions<UserServiceDbContext> options)
-        : base(options) { }
+        : base(options)
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

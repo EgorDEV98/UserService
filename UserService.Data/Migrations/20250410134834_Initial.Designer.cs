@@ -12,7 +12,7 @@ using UserService.Data;
 namespace UserService.Data.Migrations
 {
     [DbContext(typeof(UserServiceDbContext))]
-    [Migration("20250406145517_Initial")]
+    [Migration("20250410134834_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -35,10 +35,10 @@ namespace UserService.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Login")
                         .IsRequired()

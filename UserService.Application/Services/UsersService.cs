@@ -38,13 +38,12 @@ public class UsersService : IUsersService
     /// <returns></returns>
     public async Task<GetUserResponse> ValidateLogin(AuthUserParams param, CancellationToken ct)
     {
-        var hashedPassword = _passwordHasher.HashPassword(param.Password);
         var user = await _context.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Login == param.Login, ct);
         if(user is null) UnauthorizedException.Throw("Invalid login or password");
         
-        var isVerified = _passwordHasher.VerifyPassword(hashedPassword, param.Password);
+        var isVerified = _passwordHasher.VerifyPassword(param.Password, user!.Password);
         if(!isVerified) UnauthorizedException.Throw("Invalid login or password");
         
         return _mapper.Map(user!);
@@ -93,11 +92,12 @@ public class UsersService : IUsersService
     public async Task<GetUserResponse> AddUserAsync(AddUserParams param, CancellationToken ct)
     {
         var currentDate = _dateTimeProvider.GetCurrent();
+        var hasedPassword = _passwordHasher.HashPassword(param.Password);
         var newUser = new User()
         {
             Name = param.Name,
             Login = param.Login,
-            Password = _passwordHasher.HashPassword(param.Password),
+            Password = hasedPassword,
             City = param.City,
             CreatedDate = currentDate,
             LastUpdate = currentDate
@@ -125,7 +125,8 @@ public class UsersService : IUsersService
 
         if (!string.IsNullOrWhiteSpace(param.Password))
         {
-            user.Password = _passwordHasher.HashPassword(param.Password);
+            var hashedPassword = _passwordHasher.HashPassword(param.Password);
+            user.Password = hashedPassword;
         }
         user.Name = param.Name ?? user.Name;
         user.LastUpdate = _dateTimeProvider.GetCurrent();

@@ -26,6 +26,38 @@ public class UserServiceTests
 
         Seed();
     }
+
+    #region Verify
+
+    [Fact]
+    public async Task Verify_Success()
+    {
+        var result = await _userService.ValidateLogin(new AuthUserParams()
+        {
+            Login = "TEST_LOGIN",
+            Password = "TEST_PASSWORD"
+        }, CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            result.Id.Should().Be(new Guid("4F66943B-D74D-4BE4-BE65-17333D71F984"));
+        }
+    }
+    
+    [Fact]
+    public async Task Verify_Unauthorized()
+    {
+        await Assert.ThrowsAsync<UnauthorizedException>(async () =>
+        {
+            await _userService.ValidateLogin(new AuthUserParams()
+            {
+                Login = "TEST_LOGIN",
+                Password = string.Empty,
+            }, CancellationToken.None);
+        });
+    }
+
+    #endregion
     
     #region GetUser
 
